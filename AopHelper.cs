@@ -80,6 +80,11 @@ namespace AopEasyLog
         /// </summary>
         static public event EventHandler OnLogLevelChanged;
 
+        /// <summary>
+        /// 当打印Debug
+        /// </summary>
+        static public event EventHandler<string> OnDebug;
+
         #endregion
 
         #region 方法
@@ -129,6 +134,10 @@ namespace AopEasyLog
             {
             }
 
+            string debug = $"开始调用方法[{context.Method.Name}]";
+
+            Debug(debug);
+
             return dateTime;
         }
 
@@ -147,6 +156,9 @@ namespace AopEasyLog
             {
                 MemberRecordsDic[context.Method].EndInvoke(target, invokeTime, returnValue, logs);
             }
+            string debug = $"结束调用方法[{context.Method.Name}] ， 返回值:{returnValue}";
+
+            Debug(debug);
         }
 
         /// <summary>
@@ -162,6 +174,16 @@ namespace AopEasyLog
                 streamWriter.Write(stackTrace.GetFrame(i));
             }
             streamWriter.WriteLine();
+        }
+
+        /// <summary>
+        /// Debug打印
+        /// </summary>
+        /// <param name="debug">debug内容</param>
+        [IgnoreMo]
+        static public void Debug(string debug)
+        {
+            OnDebug?.Invoke(null, debug);
         }
 
         #endregion
