@@ -140,7 +140,6 @@ namespace AopEasyLog
         /// <param name="logs">函数体内部打印列表</param>
         public void EndInvoke(IAopObject target, int invokeTime, string returnValue, List<string> logs)
         {
-            if (string.IsNullOrEmpty(returnValue)) return;
             DateTime dateTime = DateTime.Now;
             string folder = this.folder;
             StreamWriter streamWriter = null;
