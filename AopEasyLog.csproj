@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="packages\Rougamo.Fody.1.4.1\build\Rougamo.Fody.props" Condition="Exists('packages\Rougamo.Fody.1.4.1\build\Rougamo.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -36,6 +37,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Rougamo, Version=1.4.1.0, Culture=neutral, PublicKeyToken=5a3dc9b06a9acd5d, processorArchitecture=MSIL">
+      <HintPath>packages\Rougamo.Fody.1.4.1\lib\netstandard2.0\Rougamo.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -80,4 +82,10 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>这台计算机上缺少此项目引用的 NuGet 程序包。使用“NuGet 程序包还原”可下载这些程序包。有关更多信息，请参见 http://go.microsoft.com/fwlink/?LinkID=322105。缺少的文件是 {0}。</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\Rougamo.Fody.1.4.1\build\Rougamo.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', 'packages\Rougamo.Fody.1.4.1\build\Rougamo.Fody.props'))" />
+  </Target>
 </Project>
