@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace AopEasyLog
+﻿namespace AopEasyLog
 {
     /// <summary>
     /// Info记录

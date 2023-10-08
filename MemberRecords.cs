@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace AopEasyLog
 {
@@ -80,7 +81,6 @@ namespace AopEasyLog
         {
             DateTime dateTime = DateTime.Now;
             string folder = this.folder;
-            StreamWriter streamWriter = null;
             if (target != null)
             {
                 folder = $"{this.folder}/{target.AopId}";
@@ -88,46 +88,23 @@ namespace AopEasyLog
                     Directory.CreateDirectory(folder);
                 if(!string.IsNullOrEmpty(target.AopDisplayName))
                 {
-                    try
-                    {
-                        streamWriter = new StreamWriter($"{folder}/AopDisplayName.txt");
-                        streamWriter.Write(target.AopDisplayName);
-                        streamWriter.Flush();
-                    }
-                    finally
-                    {
-                        streamWriter?.Close();
-                    }
+                    AopHelper.WriteFiles.Enqueue(new WriteFile($"{folder}/AopDisplayName.txt" , target.AopDisplayName));
                 }
             }
             string path = $"{folder}/[{invokeTime}][{MemberInfo.Name}]开始执行[{dateTime:yyyy.MM.dd HH.mm.ss fff}].txt";
 
-            try
+            StringBuilder stringBuilder = new StringBuilder($"参数[{paras.Count}]:");
+            foreach (var para in paras)
             {
-                streamWriter = new StreamWriter(path);
-                streamWriter.WriteLine($"参数[{paras.Count}]:");
-                foreach(var para in paras)
-                {
-                    streamWriter.WriteLine($"{para.Length}|{para}");
-                }
-                streamWriter.WriteLine();
-                streamWriter.WriteLine("堆栈:");
-                foreach(var trace in stackTrace.GetFrames())
-                {
-                    streamWriter.Write(trace);
-                }
-
-                streamWriter.Flush();
+                stringBuilder.AppendLine($"{para.Length}|{para}");
             }
-            catch (Exception)
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("堆栈:");
+            foreach (var trace in stackTrace.GetFrames())
             {
-                //ConsoleHelper.Warn(ex.Message);
+                stringBuilder.AppendLine(trace.ToString());
             }
-            finally
-            {
-                streamWriter?.Close();
-            }
-
+            AopHelper.WriteFiles.Enqueue(new WriteFile(path, stringBuilder.ToString()));
             return dateTime;
         }
 
@@ -142,7 +119,6 @@ namespace AopEasyLog
         {
             DateTime dateTime = DateTime.Now;
             string folder = this.folder;
-            StreamWriter streamWriter = null;
             if (target != null)
             {
                 folder = $"{this.folder}/{target.AopId}";
@@ -151,35 +127,22 @@ namespace AopEasyLog
             }
             string path = $"{folder}/[{invokeTime}][{MemberInfo.Name}]结束执行[{dateTime:yyyy.MM.dd HH.mm.ss fff}].txt";
 
-            try
+            StringBuilder stringBuilder = new StringBuilder();
+            if (!string.IsNullOrEmpty(returnValue))
             {
-                streamWriter = new StreamWriter(path);
-                if(!string.IsNullOrEmpty(returnValue))
+                stringBuilder.AppendLine($"返回[{returnValue.Length}]:");
+                stringBuilder.AppendLine(returnValue);
+            }
+            if (logs != null && logs.Count > 0)
+            {
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine("函数内部打印:");
+                foreach (var log in logs)
                 {
-                    streamWriter.WriteLine($"返回[{returnValue.Length}]:");
-                    streamWriter.WriteLine(returnValue);
+                    stringBuilder.AppendLine(log);
                 }
-
-                if(logs != null && logs.Count > 0)
-                {
-                    streamWriter.WriteLine();
-                    streamWriter.WriteLine("函数内部打印:");
-                    foreach(var log in logs) 
-                    {
-                        streamWriter.WriteLine(log);
-                    }
-                }
-
-                streamWriter.Flush();
             }
-            catch (Exception)
-            {
-                //ConsoleHelper.Warn(ex.Message);
-            }
-            finally
-            {
-                streamWriter?.Close();
-            }
+            AopHelper.WriteFiles.Enqueue(new WriteFile(path , stringBuilder.ToString()));
         }
 
         /// <summary>

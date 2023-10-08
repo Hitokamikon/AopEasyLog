@@ -1,10 +1,13 @@
 ﻿using Rougamo;
 using Rougamo.Context;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AopEasyLog
 {
@@ -21,9 +24,14 @@ namespace AopEasyLog
         static public string Path { get; private set; }
 
         /// <summary>
+        /// 写文件队列
+        /// </summary>
+        static internal ConcurrentQueue<WriteFile> WriteFiles { get; private set; } = new ConcurrentQueue<WriteFile>();
+
+        /// <summary>
         /// Log类型
         /// </summary>
-        static public LogType LogType { get; set; } = LogType.Console | LogType.Debug;
+        //static public LogType LogType { get; set; } = LogType.Console | LogType.Debug;
 
         /// <summary>
         /// 成员信息记录查询字典
@@ -98,12 +106,24 @@ namespace AopEasyLog
             Path = "AOP/" + DateTime.Now.ToString("yyyy.MM.dd HH.mm.ss fff");
             Directory.CreateDirectory(Path);
             Directory.CreateDirectory($"{Path}/MethodInvoke");
-            //Directory.CreateDirectory($"{Path}/MethodInvoke/Debug");
-            //Directory.CreateDirectory($"{Path}/MethodInvoke/Info");
-            //Directory.CreateDirectory($"{Path}/MethodInvoke/Warn");
-            //Directory.CreateDirectory($"{Path}/MethodInvoke/Exception");
-
             Directory.CreateDirectory($"{Path}/PropertyChange");
+
+            Task.Run(() => 
+            {
+                while(true)
+                {
+                    int count = 0;
+                    while(WriteFiles.Count > 0 && count < 10)
+                    {
+                        count++;
+                        if(WriteFiles.TryDequeue(out var file))
+                        {
+                            file?.DoWrite();
+                        }
+                    }
+                    Thread.Sleep(10);
+                }
+            });
         }
 
         /// <summary>
@@ -127,12 +147,6 @@ namespace AopEasyLog
             }
             DateTime dateTime = memberRecords.BeginInvoke(target, invokeTime, paras, new StackTrace(true));
 
-            if (LogType.HasFlag(LogType.Debug))
-            {
-            }
-            if (LogType.HasFlag(LogType.Console))
-            {
-            }
 
             string debug = $"开始调用方法[{context.Method.Name}]";
 

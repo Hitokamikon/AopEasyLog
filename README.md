@@ -82,7 +82,7 @@ AOP
               |   |   ├─……
               |   |
               |   ├─……
-              |   |
+              |   
               └─{实例Id}{创建的时间戳}
                   ├─{属性名}
                   |   ├─初始值.txt
@@ -128,5 +128,23 @@ public class Program
 </code></pre>
 代码执行后会在AOP/{时间戳}/MethodInvoke/Program/下生成两个txt文档，里面记录了方法Test()开始执行和结束执行时的一些信息
 
-# 
+# 一些配置
+
+## AOP开关
+修改AopHelper.IsOn属性可以控制AOP是否开启，当该属性修改后，可以通过Aop.OnSwitched事件来获取通知
+
+## 打印等级
+修改AopHelper.LogLevel属性可以控制AOP的打印等级<br>
+[Log]特性有一个缺省参数logLevel（默认等于1），被标记的方法只有其Log的logLevel<=AopHelper.LogLevel时，才会进行响应的打印
+
+# 整个类的方法统一打印
+可以将[Log]特性写在一个类上，此时，相当于给这个类里所有的方法都指派了[Log]特性<br>
+如果这个类中有部分方法不需要打印，则可以在其上添加[IgnoreMo]的特性
+
+# 属性变化记录
+如果一个类继承了IAopObject接口，可以用AopFactory.Create方法来对其进行创建<br>
+在该类的对象属性发生变化时（发生PropertyChanged事件），会记录下该属性的变化<br>
+如果在类上打上特性[AddINotifyPropertyChangedInterface]，则不用显式调用PropertyChanged事件（在执行set的时候会自动调用）
+
+
 

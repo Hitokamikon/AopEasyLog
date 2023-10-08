@@ -45,27 +45,31 @@ namespace AopEasyLog
             var typeName = obj.GetType().FullName;
             string folder = $"{AopHelper.Path}/PropertyChange/{typeName}/[{obj.AopId}][{CreateTime:yyyy.MM.dd HH.mm.ss fff}]";
 
-            Task.Run(() => {
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
+            if (!Directory.Exists(folder))
+                Directory.CreateDirectory(folder);
 
-                foreach (var propertyInfo in propertyInfos)
-                {
-                    PropertyChangeRecords propertyChangeRecords = new PropertyChangeRecords(propertyInfo, obj, folder);
+            foreach (var propertyInfo in propertyInfos)
+            {
+                PropertyChangeRecords propertyChangeRecords = new PropertyChangeRecords(propertyInfo, obj, folder);
 
-                    PropertyChangeRecordss.Add(propertyChangeRecords);
-                }
+                PropertyChangeRecordss.Add(propertyChangeRecords);
+            }
 
-                obj.PropertyChanged += Obj_PropertyChanged;
-            });
+            obj.PropertyChanged += Obj_PropertyChanged;
         }
 
         #endregion
 
         #region 事件响应
 
+        /// <summary>
+        /// 当物体的属性改变
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Obj_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (!AopHelper.IsOn) return;
             PropertyChangeRecords propertyChangeRecords = PropertyChangeRecordss.Find(r=>r.PropertyName == e.PropertyName);
             propertyChangeRecords?.AddRecord();
         }

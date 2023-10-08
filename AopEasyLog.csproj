@@ -68,6 +68,7 @@
     <Compile Include="PropertyChangeRecords.cs" />
     <Compile Include="Record.cs" />
     <Compile Include="WarnRecord.cs" />
+    <Compile Include="WriteFile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

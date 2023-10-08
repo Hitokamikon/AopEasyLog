@@ -73,21 +73,8 @@ namespace AopEasyLog
                 Directory.CreateDirectory(PropertyFolder);
 
             var initValue = propertyInfo.GetValue(obj);
-
-            StreamWriter streamWriter = null;
-            try
-            {
-                streamWriter = new StreamWriter(path);
-                streamWriter.WriteLine(initValue);
-                streamWriter.Flush();
-            }
-            finally
-            {
-                streamWriter?.Close();
-            }
-
+            AopHelper.WriteFiles.Enqueue(new WriteFile(path, initValue.ToString()));
         }
-        
 
         #endregion
 
@@ -101,18 +88,7 @@ namespace AopEasyLog
             object value = PropertyInfo.GetValue(Obj, null);
             PropertyChangeRecord propertyChangeRecord = new PropertyChangeRecord(value);
             Records.Add(propertyChangeRecord);
-
-            StreamWriter streamWriter = null;
-            try
-            {
-                streamWriter = new StreamWriter($"{PropertyFolder}/[{DateTime.Now:yyyy.MM.dd HH.mm.ss fff}].txt");
-                streamWriter.Write(propertyChangeRecord.ToString());
-                streamWriter.Flush();
-            }
-            finally
-            {
-                streamWriter?.Close();
-            }
+            AopHelper.WriteFiles.Enqueue(new WriteFile($"{PropertyFolder}/[{DateTime.Now:yyyy.MM.dd HH.mm.ss fff}].txt", propertyChangeRecord.ToString()));
         }
 
         #endregion

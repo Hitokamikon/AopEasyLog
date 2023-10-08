@@ -84,7 +84,7 @@ namespace AopEasyLog
             }
             else
                 invokeTimesDic.Add(context.Method, times);
-
+            
             if (!AopHelper.IsOn) return;
             if (AopHelper.LogLevel > LogLevel) return;
             List<string> paras = new List<string>();
