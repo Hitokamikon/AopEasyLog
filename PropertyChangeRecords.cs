@@ -73,7 +73,11 @@ namespace AopEasyLog
                 Directory.CreateDirectory(PropertyFolder);
 
             var initValue = propertyInfo.GetValue(obj);
-            AopHelper.WriteFiles.Enqueue(new WriteFile(path, initValue.ToString()));
+            if (initValue != null)
+                AopHelper.WriteFiles.Enqueue(new WriteFile(path, initValue.ToString()));
+            else
+                AopHelper.WriteFiles.Enqueue(new WriteFile(path, ""));
+
         }
 
         #endregion
