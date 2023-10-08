@@ -53,6 +53,7 @@
     <Compile Include="AopHelper.cs" />
     <Compile Include="AopNameAttribute.cs" />
     <Compile Include="AopObject.cs" />
+    <Compile Include="CreateDir.cs" />
     <Compile Include="DebugRecord.cs" />
     <Compile Include="ExceptionRecord.cs" />
     <Compile Include="IAopObject.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="LogType.cs" />
     <Compile Include="MemberRecords.cs" />
     <Compile Include="MethodLogPack.cs" />
+    <Compile Include="Operation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyChangeRecord.cs" />
     <Compile Include="PropertyChangeRecords.cs" />

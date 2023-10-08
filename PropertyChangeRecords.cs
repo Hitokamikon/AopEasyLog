@@ -69,14 +69,13 @@ namespace AopEasyLog
             PropertyFolder = $"{folder}/{propertyInfo.Name}";
             path = $"{PropertyFolder}/初始值.txt";
 
-            if (!Directory.Exists(PropertyFolder))
-                Directory.CreateDirectory(PropertyFolder);
+            AopHelper.Operations.Enqueue(new CreateDir(PropertyFolder));
 
             var initValue = propertyInfo.GetValue(obj);
             if (initValue != null)
-                AopHelper.WriteFiles.Enqueue(new WriteFile(path, initValue.ToString()));
+                AopHelper.Operations.Enqueue(new WriteFile(path, initValue.ToString()));
             else
-                AopHelper.WriteFiles.Enqueue(new WriteFile(path, ""));
+                AopHelper.Operations.Enqueue(new WriteFile(path, ""));
 
         }
 
@@ -92,7 +91,7 @@ namespace AopEasyLog
             object value = PropertyInfo.GetValue(Obj, null);
             PropertyChangeRecord propertyChangeRecord = new PropertyChangeRecord(value);
             Records.Add(propertyChangeRecord);
-            AopHelper.WriteFiles.Enqueue(new WriteFile($"{PropertyFolder}/[{DateTime.Now:yyyy.MM.dd HH.mm.ss fff}].txt", propertyChangeRecord.ToString()));
+            AopHelper.Operations.Enqueue(new WriteFile($"{PropertyFolder}/[{DateTime.Now:yyyy.MM.dd HH.mm.ss fff}].txt", propertyChangeRecord.ToString()));
         }
 
         #endregion

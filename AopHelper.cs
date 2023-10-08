@@ -24,9 +24,9 @@ namespace AopEasyLog
         static public string Path { get; private set; }
 
         /// <summary>
-        /// 写文件队列
+        /// 操作队列
         /// </summary>
-        static internal ConcurrentQueue<WriteFile> WriteFiles { get; private set; } = new ConcurrentQueue<WriteFile>();
+        static internal ConcurrentQueue<Operation> Operations { get; private set; } = new ConcurrentQueue<Operation>();
 
         /// <summary>
         /// Log类型
@@ -104,21 +104,22 @@ namespace AopEasyLog
         static public void Init()
         {
             Path = "AOP/" + DateTime.Now.ToString("yyyy.MM.dd HH.mm.ss fff");
-            Directory.CreateDirectory(Path);
-            Directory.CreateDirectory($"{Path}/MethodInvoke");
-            Directory.CreateDirectory($"{Path}/PropertyChange");
+
+            Operations.Enqueue(new CreateDir(Path));
+            Operations.Enqueue(new CreateDir($"{Path}/MethodInvoke"));
+            Operations.Enqueue(new CreateDir($"{Path}/PropertyChange"));
 
             Task.Run(() => 
             {
                 while(true)
                 {
                     int count = 0;
-                    while(WriteFiles.Count > 0 && count < 10)
+                    while(Operations.Count > 0 && count < 10)
                     {
                         count++;
-                        if(WriteFiles.TryDequeue(out var file))
+                        if(Operations.TryDequeue(out var file))
                         {
-                            file?.DoWrite();
+                            file?.Do();
                         }
                     }
                     Thread.Sleep(10);

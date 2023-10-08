@@ -61,8 +61,7 @@ namespace AopEasyLog
         {
             MemberInfo = context.Method;
             folder = $"{AopHelper.Path}/MethodInvoke/{context.TargetType.FullName}";
-            if(!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
+            AopHelper.Operations.Enqueue(new CreateDir(folder));
         }
 
         #endregion
@@ -84,11 +83,10 @@ namespace AopEasyLog
             if (target != null)
             {
                 folder = $"{this.folder}/{target.AopId}";
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
-                if(!string.IsNullOrEmpty(target.AopDisplayName))
+                AopHelper.Operations.Enqueue(new CreateDir(folder));
+                if (!string.IsNullOrEmpty(target.AopDisplayName))
                 {
-                    AopHelper.WriteFiles.Enqueue(new WriteFile($"{folder}/AopDisplayName.txt" , target.AopDisplayName));
+                    AopHelper.Operations.Enqueue(new WriteFile($"{folder}/AopDisplayName.txt" , target.AopDisplayName));
                 }
             }
             string path = $"{folder}/[{invokeTime}][{MemberInfo.Name}]开始执行[{dateTime:yyyy.MM.dd HH.mm.ss fff}].txt";
@@ -104,7 +102,7 @@ namespace AopEasyLog
             {
                 stringBuilder.AppendLine(trace.ToString());
             }
-            AopHelper.WriteFiles.Enqueue(new WriteFile(path, stringBuilder.ToString()));
+            AopHelper.Operations.Enqueue(new WriteFile(path, stringBuilder.ToString()));
             return dateTime;
         }
 
@@ -122,8 +120,7 @@ namespace AopEasyLog
             if (target != null)
             {
                 folder = $"{this.folder}/{target.AopId}";
-                if (!Directory.Exists(folder))
-                    Directory.CreateDirectory(folder);
+                AopHelper.Operations.Enqueue(new CreateDir(folder));
             }
             string path = $"{folder}/[{invokeTime}][{MemberInfo.Name}]结束执行[{dateTime:yyyy.MM.dd HH.mm.ss fff}].txt";
 
@@ -142,7 +139,7 @@ namespace AopEasyLog
                     stringBuilder.AppendLine(log);
                 }
             }
-            AopHelper.WriteFiles.Enqueue(new WriteFile(path , stringBuilder.ToString()));
+            AopHelper.Operations.Enqueue(new WriteFile(path , stringBuilder.ToString()));
         }
 
         /// <summary>

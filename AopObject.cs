@@ -45,8 +45,7 @@ namespace AopEasyLog
             var typeName = obj.GetType().FullName;
             string folder = $"{AopHelper.Path}/PropertyChange/{typeName}/[{obj.AopId}][{CreateTime:yyyy.MM.dd HH.mm.ss fff}]";
 
-            if (!Directory.Exists(folder))
-                Directory.CreateDirectory(folder);
+            AopHelper.Operations.Enqueue(new CreateDir(folder));
 
             foreach (var propertyInfo in propertyInfos)
             {

@@ -5,7 +5,7 @@ namespace AopEasyLog
     /// <summary>
     /// 写文件
     /// </summary>
-    internal class WriteFile
+    internal class WriteFile : Operation
     {
         #region 属性
 
@@ -39,9 +39,9 @@ namespace AopEasyLog
         #region 方法
 
         /// <summary>
-        /// 执行写操作
+        /// 执行
         /// </summary>
-        internal void DoWrite()
+        internal override void Do()
         {
             File.WriteAllText(Path, Content);
         }
